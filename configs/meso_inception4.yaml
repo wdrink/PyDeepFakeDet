@@ -1,0 +1,38 @@
+NUM_GPUS: 8
+DATALOADER:
+  BATCH_SIZE: 32
+  NUM_WORKERS: 24
+LOSS:
+  LOSS_FUN: FocalLoss
+  logits: False
+MODEL:
+  MODEL_NAME: MesoInception4
+  num_classes: 2
+OPTIMIZER:
+  OPTIMIZER_METHOD: sgd
+  BASE_LR: 0.001
+  EPS: 0.00000001
+  MOMENTUM: 0.9
+DATASET:
+  IMG_SIZE: 256
+  TRAIN_AUGMENTATIONS:
+    COMPOSE:
+      [
+        [
+          ColorJitter,
+          RandomBrightnessContrast,
+          HueSaturationValue,
+          CLAHE,
+          RandomGamma,
+          Sharpen
+        ],
+        GaussNoise,
+        ImageCompression,
+        RandomResizedCrop,
+        Normalize
+      ]
+    RANDOMRESIZEDCROP_PARAMS: [256, 256, [0.8, 1], [0.75, 1.33]]
+    ROTATE_PARAMS: [10]
+    COARSEDROPOUT_PARAMS: [10, 10]
+    IMAGECOMPRESSION_PARAMS: [65, 80]
+    NORMALIZE_PARAMS: [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]

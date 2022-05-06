@@ -1,0 +1,31 @@
+MODEL:
+  MODEL_NAME: GramNet
+  PRETRAINED: 'imagenet'
+  NUM_CLASSES: 2
+DATASET:
+  IMG_SIZE: 299
+  TRAIN_AUGMENTATIONS:
+    COMPOSE:
+      [
+        Resize,
+        HorizontalFlip,
+        Normalize
+      ]
+    NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+  TEST_AUGMENTATIONS:
+    COMPOSE: [Resize, Normalize]
+    NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+DATALOADER:
+  BATCH_SIZE: 32
+  NUM_WORKERS: 16
+OPTIMIZER:
+  OPTIMIZER_METHOD: adam
+  BASE_LR: 0.0002
+  ADAM_BETAS: [0.9, 0.999]
+  EPS: 0.00000001
+  WEIGHT_DECAY: 0.000001
+SCHEDULER:
+  SCHEDULER_TYPE: step
+  DECAY_EPOCHS: 5
+  DECAY_RATE: 0.5
+

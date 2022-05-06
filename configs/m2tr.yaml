@@ -1,0 +1,46 @@
+NUM_GPUS: 8
+DATALOADER:
+  BATCH_SIZE: 8
+  NUM_WORKERS: 4
+MODEL:
+  MODEL_NAME: M2TR
+  FIND_UNUSED_PARAMETERS: True
+  PRETRAINED: 'imagenet'
+  ESCAPE: ''
+  IMG_SIZE: 320
+  BACKBONE: efficientnet-b4
+  DEPTH: 4
+  TEXTURE_LAYER: b2
+  FEATURE_LAYER: final
+  NUM_CLASSES: 2
+  DROP_RATIO: 0.5
+  HAS_DECODER: False
+OPTIMIZER:
+  OPTIMIZER_METHOD: sgd
+  BASE_LR: 0.0005
+  EPS: 0.00000001
+  MOMENTUM: 0.9
+DATASET:
+  IMG_SIZE: 320
+  TRAIN_AUGMENTATIONS:
+    COMPOSE:
+      [
+        [
+          ColorJitter,
+          RandomBrightnessContrast,
+          HueSaturationValue,
+          CLAHE,
+          RandomGamma,
+          Sharpen
+        ],
+        GaussNoise,
+        HorizontalFlip,
+        ImageCompression,
+        RandomResizedCrop,
+        Normalize
+      ]
+    RANDOMRESIZEDCROP_PARAMS: [320, 320, [0.8, 1], [0.75, 1.33]]
+    ROTATE_PARAMS: [10]
+    COARSEDROPOUT_PARAMS: [10, 10]
+    IMAGECOMPRESSION_PARAMS: [65, 80]
+    NORMALIZE_PARAMS: [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]
