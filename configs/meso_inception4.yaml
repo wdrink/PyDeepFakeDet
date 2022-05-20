@@ -7,7 +7,7 @@ LOSS:
   logits: False
 MODEL:
   MODEL_NAME: MesoInception4
-  num_classes: 2
+  NUM_CLASSES: 2
 OPTIMIZER:
   OPTIMIZER_METHOD: sgd
   BASE_LR: 0.001

@@ -24,14 +24,11 @@ Before running the code, you need prepare
 
 ### Run
 
-Examples: `python visualization/gramdcam.py --model Xception --pth Xception.pth --layer res4 --img demo.jpg --save_path save.jpg`   
+Examples: `python visualization/gradcam.py --model Xception --pth Xception.pth --layer res4 --img demo.jpg --save_path save.jpg`   
 
 args:
 
 ```python
-python preprocess/extract_frames.py -h
-usage: crop.py [-h] -root_dir ROOT_PATH
-
 optional arguments:
   -h, --help            show this help message and exit
   --model,  model name, should be exactly same with the file name in PyDeepFakeDet/models

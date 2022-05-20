@@ -8,7 +8,7 @@ from PyDeepFakeDet.utils.registries import MODEL_REGISTRY
 class Meso4(nn.Module):
     def __init__(self, model_cfg):
         super(Meso4, self).__init__()
-        num_classes = model_cfg["num_classes"] 
+        num_classes = model_cfg["NUM_CLASSES"] 
         self.conv1 = Meso1(3, 8, 3, 2)
         self.conv2 = Meso1(8, 8, 5, 2)
         self.conv3 = Meso1(8, 16, 5, 2)

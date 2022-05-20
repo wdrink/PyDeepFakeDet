@@ -9,7 +9,7 @@ from PyDeepFakeDet.utils.registries import MODEL_REGISTRY
 class MesoInception4(nn.Module):
     def __init__(self, model_cfg):
         super(MesoInception4, self).__init__()
-        num_classes = model_cfg["num_classes"]
+        num_classes = model_cfg["NUM_CLASSES"]
         self.inception_conv1 = InceptionLayer(3, 1, 4, 4, 2)
         self.inception_conv2 = InceptionLayer(11, 2, 4, 4, 2)
         self.conv3 = Meso1(12, 16, 5, 2)

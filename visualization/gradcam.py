@@ -44,7 +44,7 @@ class GradCAM:
     def forward(self, img_arr: np.ndarray, label=None, show=True, write=False, path=''):
         img_input = self.__img_preprocess(img_arr.copy())
 
-        output = self.model(img_input)
+        output = self.model({"img": img_input})
         output = output["logits"]
         idx = np.argmax(output.cpu().data.numpy())
 
@@ -135,7 +135,7 @@ if __name__== "__main__":
     parser.add_argument('--img', type=str)
     args = parser.parse_args()
     cfg = {"PRETRAINED": False, "ESCAPE": ""}
-    net = models.getattr(args.model)(cfg)
+    net = getattr(models, args.model)(cfg)
     state_dic = torch.load(args.pth)
     print("keys in your model:", state_dic["model_state"].keys())
     load_checkpoint(args.pth, net, False)
