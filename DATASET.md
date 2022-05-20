@@ -21,15 +21,14 @@ There are two steps for data preparation:
 Multi threads are used to extract video frames. You need to prepare the data set in advance.
 
 ```python
-python preprocess/extract_frames.py -h
-usage: crop.py [-h] -root_dir ROOT_PATH
+python preprocess/extract_frames.py --root_dir ROOT_PATH --save_dir SAVE_DIR --samples 128
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --root_dir,  DATASET root path
-  --save_dir,     Frames data save path
+  -h, --help,    Show this help message and exit
+  --root_dir,    DATASET root path
+  --save_dir,    Frames data save path
   --samples,     Number of frames you want to extract for each video
-  --process,     Number of processes processed, default=1  
+  --process,     Number of processes processed, default=1
 ```
 
 Examples: `python --root_dir video_dir --save_dir frame_dir --samples 128 --process 1`
@@ -39,12 +38,11 @@ Examples: `python --root_dir video_dir --save_dir frame_dir --samples 128 --proc
 We use retinaface to crop the face region and also use multi threads with maximum numbers of gpu. 
 
 ```python
-python preprocess/extract_faces.py -h
-usage: crop.py [-h] -root_dir ROOT_PATH
+python preprocess/extract_faces.py --root_dir ROOT_PATH --save_dir SAVE_DIR
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --root_dir,  frame data root path
-  --save_dir,    face data save path
-  --process,     Number of processes processed, default=1  
+  -h, --help,    Show this help message and exit
+  --root_dir,    Frame data root path
+  --save_dir,    Face data save path
+  --process,     Number of processes processed, default=1
 ```
