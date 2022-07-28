@@ -433,7 +433,6 @@ class EfficientNet(nn.Module):
         self.stage_map = []
         stage_count = 0
         for block_args in self._blocks_args:
-
             # Update block input and output filters based on depth multiplier.
             block_args = block_args._replace(
                 input_filters=round_filters(
@@ -486,28 +485,12 @@ class EfficientNet(nn.Module):
         for block in self._blocks:
             block.set_swish(memory_efficient)
 
-    def extract_textures(self, inputs, layers):
+    def extract_features(self, inputs, layers):
         # Stem
         x = self._swish(self._bn0(self._conv_stem(inputs)))
         layers['b0'] = x
         # Blocks
-        for idx, block in enumerate(self._blocks[:6]):
-            drop_connect_rate = self._global_params.drop_connect_rate
-            if drop_connect_rate:
-                drop_connect_rate *= float(idx) / len(self._blocks)
-            x = block(x, drop_connect_rate=drop_connect_rate)
-            stage = self.stage_map[idx]
-            if stage:
-                layers[stage] = x
-                if stage == self.escape:
-                    return None
-
-        return x
-
-    def extract_features(self, x, layers):
-        # Blocks
-        for idx, block in enumerate(self._blocks[6:]):
-            idx += 6
+        for idx, block in enumerate(self._blocks):
             drop_connect_rate = self._global_params.drop_connect_rate
             if drop_connect_rate:
                 drop_connect_rate *= float(idx) / len(self._blocks)
@@ -526,7 +509,6 @@ class EfficientNet(nn.Module):
         x = samples['img']
         bs = x.size(0)
         layers = {}
-        x = self.extract_textures(x, layers)
         x = self.extract_features(x, layers)
         if x is None:
             return layers
