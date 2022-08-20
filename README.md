@@ -66,7 +66,7 @@ The baseline Models on [Celeb-DF](https://github.com/yuezunli/celeb-deepfakefore
 | F3Net |96.47 |[CelebDF](https://drive.google.com/file/d/1iHYJnvCmakjUs0QJH53ZgwwaWvudOp34/view?usp=sharing) |
 | MAT | 99.02 | [CelebDF](https://drive.google.com/file/d/1WApYy9ekgEq-Kt8641f9fAdThy1-ndqB/view?usp=sharing) |
 | ViT | 96.73 | [CelebDF](https://drive.google.com/file/d/1gzh9WlUE50sQ3meVAiagujADi6VR4t5F/view?usp=sharing) |
-| M2TR |99.76 |[CelebDF](https://drive.google.com/file/d/1_HaPE6r7Zzof2mmLmmc4fbIbqyWs17S0/view?usp=sharing) |
+| M2TR |99.76 |[CelebDF](https://drive.google.com/file/d/19mPqJ1DzkPr89VHVjHD2b0dqiZjufZnG/view?usp=sharing) |
 
 ## Installation
 
