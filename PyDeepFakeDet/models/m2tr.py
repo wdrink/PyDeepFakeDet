@@ -281,14 +281,14 @@ class M2TR(nn.Module):
         B = rgb.size(0)
 
         layers = {}
-        rgb = self.model.extract_textures(rgb, layers)
+        rgb = self.model.extract_features(rgb, layers, end_idx=6)
 
         for attn, filter, cma in self.layers:
             rgb = attn(rgb)
             freq = filter(rgb)
             rgb = cma(rgb, freq)
 
-        features = self.model.extract_features(rgb, layers)
+        features = self.model.extract_features(rgb, layers, start_idx=6)
         features = F.adaptive_avg_pool2d(features, (1, 1))
         features = features.view(B, features.size(1))
 
