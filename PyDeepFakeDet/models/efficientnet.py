@@ -154,7 +154,7 @@ class SwishImplementation(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        i = ctx.saved_variables[0]
+        i = ctx.saved_tensors[0]
         sigmoid_i = torch.sigmoid(i)
         return grad_output * (sigmoid_i * (1 + i * (1 - sigmoid_i)))
 
@@ -207,16 +207,6 @@ def drop_connect(inputs, p, training):
     binary_tensor = torch.floor(random_tensor)
     output = inputs / keep_prob * binary_tensor
     return output
-
-
-class Identity(nn.Module):
-    def __init__(
-        self,
-    ):
-        super(Identity, self).__init__()
-
-    def forward(self, input):
-        return input
 
 
 class MBConvBlock(nn.Module):
@@ -366,10 +356,11 @@ class Conv2dStaticSamePadding(nn.Conv2d):
                 (pad_w // 2, pad_w - pad_w // 2, pad_h // 2, pad_h - pad_h // 2)
             )
         else:
-            self.static_padding = Identity()
+            self.static_padding = None
 
     def forward(self, x):
-        x = self.static_padding(x)
+        if self.static_padding:
+            x = self.static_padding(x)
         x = F.conv2d(
             x,
             self.weight,
@@ -485,12 +476,17 @@ class EfficientNet(nn.Module):
         for block in self._blocks:
             block.set_swish(memory_efficient)
 
-    def extract_features(self, inputs, layers):
-        # Stem
-        x = self._swish(self._bn0(self._conv_stem(inputs)))
-        layers['b0'] = x
+    def extract_features(self, x, layers, start_idx = 0, end_idx=None):
+        assert start_idx >= 0
+        if start_idx == 0 :
+            x = self._swish(self._bn0(self._conv_stem(x)))
+            layers['b0'] = x
+        if end_idx == None or end_idx > len(self._blocks):
+            end_idx = len(self._blocks)
+        assert start_idx < end_idx
         # Blocks
-        for idx, block in enumerate(self._blocks):
+        for idx in range(start_idx, end_idx):
+            block = self._blocks[idx]
             drop_connect_rate = self._global_params.drop_connect_rate
             if drop_connect_rate:
                 drop_connect_rate *= float(idx) / len(self._blocks)
@@ -500,9 +496,10 @@ class EfficientNet(nn.Module):
                 layers[stage] = x
                 if stage == self.escape:
                     return None
-        # Head
-        x = self._bn1(self._conv_head(x))
-        x = self._swish(x)
+        if end_idx == len(self._blocks):
+            # Head
+            x = self._bn1(self._conv_head(x))
+            x = self._swish(x)
         return x
 
     def forward(self, samples):
