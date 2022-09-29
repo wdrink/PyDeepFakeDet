@@ -34,6 +34,7 @@ class DeepFakeDataset(Dataset):
                 self.dataset_name + '_splits_' + mode + '.txt',
             )
         self.info_list = open(self.info_txt).readlines()
+        print("finish")
 
     def __len__(self):
         return len(self.info_list)

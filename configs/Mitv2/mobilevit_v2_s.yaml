@@ -1,0 +1,96 @@
+OUTPUT_AND_PATH: '/mnt/data/liyihui/face_data/DFDet/Output/mobilevit_v2_s.txt'
+NUM_GPUS: 3
+INIT_METHOD: tcp://localhost:12355
+LOG_FILE_PATH: ./logs/MobileVitv2/s/
+DATASET:
+  ROOT_DIR: /mnt/data/liyihui/face_data/DFDet/
+  TRAIN_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/train_list.txt
+  VAL_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/val_list.txt
+  TEST_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/test_list.txt
+  IMG_SIZE: 384
+  TRAIN_AUGMENTATIONS:
+    COMPOSE:
+      [
+        Resize,
+        HorizontalFlip,
+        Normalize
+      ]
+    NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+  TEST_AUGMENTATIONS:
+    COMPOSE: [Resize, Normalize]
+    NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+DATALOADER:
+  BATCH_SIZE: 10
+  NUM_WORKERS: 4
+MODEL:
+  MODEL_NAME: MobileViTv2
+  NUM_CLASSES: 2
+  layer0:
+    img_channels: 3
+    out_channels: 64
+  layer1:
+    out_channels: 128
+    expand_ratio: 2
+    num_blocks: 1
+    stride: 1
+    block_type: "mv2"
+  layer2:
+    out_channels: 256
+    expand_ratio: 2
+    num_blocks: 2
+    stride: 2
+    block_type: "mv2"
+  layer3:
+    out_channels: 512
+    attn_unit_dim: 256
+    ffn_multiplier: 2
+    attn_blocks: 2
+    patch_h: 2  # 8,
+    patch_w: 2  # 8,
+    stride: 2
+    mv_expand_ratio: 2
+    block_type: "mobilevit"
+  layer4: # 14x14
+    out_channels: 768
+    attn_unit_dim: 384
+    ffn_multiplier: 2
+    attn_blocks: 4
+    patch_h: 2  # 4,
+    patch_w: 2  # 4,
+    stride: 2
+    mv_expand_ratio: 2
+    num_heads: 4
+    block_type: "mobilevit"
+  layer5:  # 7x7
+    out_channels: 1024
+    attn_unit_dim: 512
+    ffn_multiplier: 2
+    attn_blocks: 3
+    patch_h: 2
+    patch_w: 2
+    stride: 2
+    mv_expand_ratio: 2
+    num_heads: 4
+    block_type: "mobilevit"
+  last_layer_exp_factor: 4
+OPTIMIZER:
+  OPTIMIZER_METHOD: adam
+  BASE_LR: 0.0004
+  ADAM_BETAS: [0.9, 0.999]
+  EPS: 0.00000001
+  WEIGHT_DECAY: 0.000001
+SCHEDULER:
+  SCHEDULER_TYPE: step
+  DECAY_EPOCHS: 5
+  DECAY_RATE: 0.5
+TRAIN:
+  ENABLE: Train
+  MAX_EPOCH: 20
+  EVAL_PERIOD: 1
+  CHECKPOINT_PERIOD: 2
+  CHECKPOINT_EPOCH_RESET: FALSE
+  CHECKPOINT_LOAD_PATH: ''
+  CHECKPOINT_SAVE_PATH: '/mnt/data/liyihui/face_data/DFDet/model/mobilevit_v2/s/'
+TEST:
+  ENABLE: False
+  TEST_CHECKPOINT_PATH: '/mnt/data/liyihui/face_data/DFDet/model/mobilevit/MobileViTv2_FFDF_.pyth'

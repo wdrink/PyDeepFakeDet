@@ -1,3 +1,5 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICE'] = '3,4,5'
 import torch
 from torch.utils.data import DataLoader
 

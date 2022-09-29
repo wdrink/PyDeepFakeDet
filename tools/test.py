@@ -19,7 +19,7 @@ logger = logging.get_logger(__name__)
 
 @torch.no_grad()
 def perform_test(
-    test_loader, model, cfg, cur_epoch=None, writer=None, mode='Test'
+        test_loader, model, cfg, cur_epoch=None, writer=None, mode='Test'
 ):
     criterion = build_loss_fun(cfg)
 
@@ -30,6 +30,8 @@ def perform_test(
     model.eval()
 
     for samples in metric_logger.log_every(test_loader, 10, header):
+        paths = samples['path']
+        samples.pop('path')
         samples = dict(
             zip(
                 samples,
@@ -42,11 +44,17 @@ def perform_test(
         with torch.cuda.amp.autocast(enabled=cfg['AMP_ENABLE']):
             outputs = model(samples)
             loss = criterion(outputs, samples)
-            preds = F.softmax(outputs['logits'], dim=1)[:, 1]
+            pred = F.softmax(outputs['logits'], dim=1)
+            preds = pred[:, 1]
             auc_metrics.update(samples['bin_label'].squeeze(dim=1), preds)
         acc1 = accuracy(
             outputs['logits'], samples['bin_label'], topk=(1,)
         )
+        with open(cfg['OUTPUT_AND_PATH'], 'a') as outp:
+            _, p = outputs['logits'].topk(1, 1, True, True)
+            for ooo, dirp, real in zip(p, paths, samples['bin_label']):
+                outp.write(dirp + ' ' + str(ooo.item()) + ' ' + str(real.item()) + '\n')
+                # outp.write(str(ooo.item()) + '\n')
         batch_size = samples['img'].shape[0]
         metric_logger.update(loss=loss.item())
         metric_logger.meters['acc1'].update(acc1[0].item(), n=batch_size)
@@ -77,6 +85,9 @@ def test(local_rank, num_proc, init_method, shard_id, num_shards, cfg):
         num_shards=num_shards,
         init_method=init_method,
     )
+    with open(cfg['OUTPUT_AND_PATH'], 'w') as outp:
+        outp.write(cfg['MODEL']['MODEL_NAME'] + '\n')
+
     np.random.seed(cfg['RNG_SEED'])
     torch.manual_seed(cfg['RNG_SEED'])
 

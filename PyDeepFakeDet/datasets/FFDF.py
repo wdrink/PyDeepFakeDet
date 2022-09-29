@@ -23,6 +23,7 @@ class FFDF(DeepFakeDataset):
         sample = {
             'img': img,
             'bin_label': [int(img_label_binary)],
+            'path': image_abs_path,
         }
 
         sample['img'] = torch.FloatTensor(sample['img'])

@@ -1,5 +1,5 @@
-import argparse
 import os
+import argparse
 import pickle
 import random
 from multiprocessing import Process, Queue
@@ -10,10 +10,16 @@ import torch
 from retinaface.pre_trained_models import get_model
 
 parser = argparse.ArgumentParser('script', add_help=False)
-parser.add_argument('--root_dir', type=str)
-parser.add_argument('--save_dir', type=str)
-parser.add_argument('--process', default=8, type=int)
+parser.add_argument('--root_dir',
+                    default='/mnt/data/liyihui/face_data/DFDet/F2F_image/',
+                    type=str)
+parser.add_argument('--save_dir',
+                    default='/mnt/data/liyihui/face_data/DFDet/F2F_image_face/',
+                    type=str)
+parser.add_argument('--process', default=1, type=int)
 args = parser.parse_args()
+if not os.path.exists(args.save_dir):
+    os.mkdir(args.save_dir)
 
 
 def read_list(path):
@@ -48,7 +54,7 @@ def can_seg(img_path, save_path, model=None, scale=1.3):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     annotation = model.predict_jsons(
         img, confidence_threshold=0.3
-    ) 
+    )
     if len(annotation[0]['bbox']) == 0:
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imwrite('./tmp2/%d.jpg' % (random.randint(1, 100)), img)
@@ -88,7 +94,7 @@ def solve(process_id, raw_list):
         try:
             if 'tmp' not in raw_path:
                 if os.path.exists(save_path) or can_seg(
-                    raw_path, save_path, model
+                        raw_path, save_path, model
                 ):
                     new_list.append(line)
         except Exception as e:
@@ -129,7 +135,7 @@ if __name__ == '__main__':
             sub_raw_list.append(raw_list[i:n])
             break
         else:
-            sub_raw_list.append(raw_list[i : i + step])
+            sub_raw_list.append(raw_list[i: i + step])
     process_list = []
     Q = Queue()
     for i, item in enumerate(sub_raw_list):

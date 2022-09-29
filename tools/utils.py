@@ -18,7 +18,7 @@ def parse_args():
         "--cfg",
         dest="cfg_file",
         help="Path to the config file",
-        required=True,
+        default='mobilevit_v2.yaml',
         type=str,
     )
     parser.add_argument(

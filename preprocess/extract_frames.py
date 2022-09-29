@@ -1,5 +1,6 @@
-import argparse
 import os
+os.environ['CUDA_VISIBLE_DEVICE'] = '5，6，7，8'
+import argparse
 import pickle
 import random
 from multiprocessing import Process, Queue
@@ -10,12 +11,18 @@ import cv2
 parser = argparse.ArgumentParser('script', add_help=False)
 if not os.path.exists('tmp'):
     os.mkdir('tmp')
-parser.add_argument('--root_dir', type=str)
-parser.add_argument('--save_dir', type=str)
-parser.add_argument('--samples', type=int)
-parser.add_argument('--process', default=1, type=int)
+parser.add_argument('--root_dir',
+                    default='/mnt/data/liyihui/face_data/DFDet/F2F/F2F_video/',
+                    type=str)
+parser.add_argument('--save_dir', default='/mnt/data/liyihui/face_data/DFDet/F2F/F2F_image', type=str)
+parser.add_argument('--samples', default=100, type=int)
+parser.add_argument('--process', default=8, type=int)
+parser.add_argument('--set_type', default='test', type=str)
 args = parser.parse_args()
-video_list_path = os.path.join(args.root_dir, 'video_list.txt')
+video_list_path = os.path.join(args.root_dir, 'video_list_' + args.set_type + '.txt')
+args.save_dir = args.save_dir + '_' + args.set_type
+if not os.path.exists(args.save_dir):
+    os.mkdir(args.save_dir)
 image_list_path = os.path.join(args.save_dir, 'image_list.txt')
 
 
@@ -100,42 +107,42 @@ def solve(process_id, video_list, samples):
         pickle.dump(image_list, w)
 
 
-if __name__ == '__main__':
-    video_list = read_list(video_list_path)
-    image_list = []
-    gen_dirs(args.root_dir, args.save_dir)
-    # multi-process
-    num_process = args.process
-    sub_video_list = []
-    n = len(video_list)
-    step = n // num_process
-    j = 0
-    random.shuffle(video_list)
-    for i in range(0, n, step):
-        j += 1
-        if j == num_process:
-            sub_video_list.append(video_list[i:n])
-            break
-        else:
-            sub_video_list.append(video_list[i : i + step])
-    process_list = []
-    Q = Queue()
-    for i, item in enumerate(sub_video_list):
-        cur_process = Process(target=solve, args=(i, item, args.samples))
-        process_list.append(cur_process)
-    for process in process_list:
-        process.start()
-    for process in process_list:
-        process.join()
+# if __name__ == '__main__':
+video_list = read_list(video_list_path)
+image_list = []
+gen_dirs(args.root_dir, args.save_dir)
+# multi-process
+num_process = args.process
+sub_video_list = []
+n = len(video_list)
+step = n // num_process
+j = 0
+random.shuffle(video_list)
+for i in range(0, n, step):
+    j += 1
+    if j == num_process:
+        sub_video_list.append(video_list[i:n])
+        break
+    else:
+        sub_video_list.append(video_list[i: i + step])
+process_list = []
+Q = Queue()
+for i, item in enumerate(sub_video_list):
+    cur_process = Process(target=solve, args=(i, item, args.samples))
+    process_list.append(cur_process)
+for process in process_list:
+    process.start()
+for process in process_list:
+    process.join()
 
-    # merge
-    print("merge")
-    sub_image_list = []
-    for i in range(num_process):
-        with open("tmp/%d.pkl" % i, 'rb') as f:
-            sub_image_list.append(pickle.load(f))
-    image_list = []
-    for ele in sub_image_list:
-        for line in ele:
-            image_list.append(line)
-    write_list(image_list_path, image_list)
+# merge
+print("merge")
+sub_image_list = []
+for i in range(num_process):
+    with open("tmp/%d.pkl" % i, 'rb') as f:
+        sub_image_list.append(pickle.load(f))
+image_list = []
+for ele in sub_image_list:
+    for line in ele:
+        image_list.append(line)
+write_list(image_list_path, image_list)

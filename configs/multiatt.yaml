@@ -1,4 +1,9 @@
+OUTPUT_AND_PATH: '/mnt/data/liyihui/face_data/DFDet/Output/mat.txt'
 DATASET:
+  ROOT_DIR: /mnt/data/liyihui/face_data/DFDet/
+  TRAIN_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/train_list.txt
+  VAL_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/val_list.txt
+  TEST_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/test_list.txt
   IMG_SIZE: 380
   TRAIN_AUGMENTATIONS:
     COMPOSE:
@@ -12,8 +17,8 @@ DATASET:
     COMPOSE: [Resize, Normalize]
     NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
 DATALOADER:
-  BATCH_SIZE: 8
-  NUM_WORKERS: 10
+  BATCH_SIZE: 32
+  NUM_WORKERS: 4
 OPTIMIZER:
   OPTIMIZER_METHOD: adam
   BASE_LR: 0.001
@@ -54,3 +59,6 @@ MODEL:
     AGDA_MODE: soft
     AGDA_LOSS_WEIGHT: 1
 
+TEST:
+  ENABLE: True
+  TEST_CHECKPOINT_PATH: '/mnt/data/liyihui/face_data/DFDet/model/MAT_FFDF_c23.pyth'

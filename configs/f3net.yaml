@@ -1,9 +1,11 @@
-NUM_GPUS: 8
+OUTPUT_AND_PATH: '/mnt/data/liyihui/face_data/DFDet/Output/f3net.txt'
+INIT_METHOD: tcp://localhost:9888
+NUM_GPUS: 1
 TRAIN:
   MAX_EPOCH: 1000
   CHECKPOINT_PERIOD: 5
 DATALOADER:
-  BATCH_SIZE: 16
+  BATCH_SIZE: 32
   NUM_WORKERS: 28
 LOSS:
   LOSS_FUN: FocalLoss
@@ -30,6 +32,10 @@ SCHEDULER:
   WARM_UP_lr: 0.00002
   WARMUP_EPOCHS: 5
 DATASET:
+  ROOT_DIR: /mnt/data/liyihui/face_data/DFDet/
+  TRAIN_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/train_list.txt
+  VAL_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/val_list.txt
+  TEST_INFO_TXT: /mnt/data/liyihui/face_data/DFDet/dataset_list/test_list.txt
   IMG_SIZE: 299
   TRAIN_AUGMENTATIONS:
     COMPOSE:
@@ -53,4 +59,6 @@ DATASET:
     COARSEDROPOUT_PARAMS: [10, 10]
     IMAGECOMPRESSION_PARAMS: [65, 80]
     NORMALIZE_PARAMS: [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]
-  
+TEST:
+  ENABLE: True
+  TEST_CHECKPOINT_PATH: '/mnt/data/liyihui/face_data/DFDet/model/F3Net_FFDF_c23.pyth'

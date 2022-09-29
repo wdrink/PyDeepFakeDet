@@ -31,6 +31,7 @@ def train_epoch(
     print_freq = 10
 
     for samples in train_meter.log_every(train_loader, print_freq, header):
+        samples.pop('path')
         samples = dict(
             zip(
                 samples,

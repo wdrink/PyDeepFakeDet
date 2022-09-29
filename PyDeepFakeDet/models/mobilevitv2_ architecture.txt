@@ -1,0 +1,57 @@
+MobileViTv2(
+  (conv_1): Conv2d(3, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False, normalization=BatchNorm2d, activation=Swish, bias=False)
+  (layer_1): Sequential(
+    (0): InvertedResidual(in_channels=64, out_channels=128, stride=1, exp=2, dilation=1, skip_conn=False)
+  )
+  (layer_2): Sequential(
+    (0): InvertedResidual(in_channels=128, out_channels=256, stride=2, exp=2, dilation=1, skip_conn=False)
+    (1): InvertedResidual(in_channels=256, out_channels=256, stride=1, exp=2, dilation=1, skip_conn=True)
+  )
+  (layer_3): Sequential(
+    (0): InvertedResidual(in_channels=256, out_channels=512, stride=2, exp=2, dilation=1, skip_conn=False)
+    (1): MobileViTBlockv2(
+    	 Local representations
+    		 Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512, bias=False, normalization=BatchNorm2d, activation=Swish, bias=False)
+    		 Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False, bias=False)
+    	 Global representations with patch size of 2x2
+    		 LinearAttnFFN(embed_dim=256, ffn_dim=512, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=256, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LinearAttnFFN(embed_dim=256, ffn_dim=512, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=256, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LayerNorm2D(num_channels=256, eps=1e-05, affine=True)
+    		 Conv2d(256, 512, kernel_size=(1, 1), stride=(1, 1), bias=False, normalization=BatchNorm2d, bias=False)
+    )
+  )
+  (layer_4): Sequential(
+    (0): InvertedResidual(in_channels=512, out_channels=768, stride=2, exp=2, dilation=1, skip_conn=False)
+    (1): MobileViTBlockv2(
+    	 Local representations
+    		 Conv2d(768, 768, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=768, bias=False, normalization=BatchNorm2d, activation=Swish, bias=False)
+    		 Conv2d(768, 384, kernel_size=(1, 1), stride=(1, 1), bias=False, bias=False)
+    	 Global representations with patch size of 2x2
+    		 LinearAttnFFN(embed_dim=384, ffn_dim=768, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=384, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LinearAttnFFN(embed_dim=384, ffn_dim=768, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=384, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LinearAttnFFN(embed_dim=384, ffn_dim=768, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=384, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LinearAttnFFN(embed_dim=384, ffn_dim=768, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=384, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LayerNorm2D(num_channels=384, eps=1e-05, affine=True)
+    		 Conv2d(384, 768, kernel_size=(1, 1), stride=(1, 1), bias=False, normalization=BatchNorm2d, bias=False)
+    )
+  )
+  (layer_5): Sequential(
+    (0): InvertedResidual(in_channels=768, out_channels=1024, stride=2, exp=2, dilation=1, skip_conn=False)
+    (1): MobileViTBlockv2(
+    	 Local representations
+    		 Conv2d(1024, 1024, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1024, bias=False, normalization=BatchNorm2d, activation=Swish, bias=False)
+    		 Conv2d(1024, 512, kernel_size=(1, 1), stride=(1, 1), bias=False, bias=False)
+    	 Global representations with patch size of 2x2
+    		 LinearAttnFFN(embed_dim=512, ffn_dim=1024, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=512, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LinearAttnFFN(embed_dim=512, ffn_dim=1024, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=512, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LinearAttnFFN(embed_dim=512, ffn_dim=1024, dropout=0.0, ffn_dropout=0.0, attn_fn=LinearSelfAttention(embed_dim=512, attn_dropout=0.0), norm_layer=layer_norm_2d)
+    		 LayerNorm2D(num_channels=512, eps=1e-05, affine=True)
+    		 Conv2d(512, 1024, kernel_size=(1, 1), stride=(1, 1), bias=False, normalization=BatchNorm2d, bias=False)
+    )
+  )
+  (conv_1x1_exp): Identity
+  (classifier): Sequential(
+    (0): GlobalPool(type=mean)
+    (1): LinearLayer(in_features=1024, out_features=1000, bias=True, channel_first=False)
+  )
+)

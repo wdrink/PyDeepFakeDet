@@ -1,3 +1,6 @@
+import sys
+
+sys.path.append('/mnt/data/liyihui/job/PyDeepFakeDet')
 import cv2
 import numpy as np
 from PIL import Image
@@ -13,22 +16,28 @@ from PyDeepFakeDet.utils.checkpoint import load_checkpoint
 import argparse
 
 
-
 class GradCAM:
     def __init__(
-        self,
-        model: nn.Module,
-        target_layer: str,
-        size=(224, 224),
-        num_cls=1000,
-        mean=None,
-        std=None,
+            self,
+            model: nn.Module,
+            target_layer: str,
+            size=(224, 224),
+            num_cls=1000,
+            mean=None,
+            std=None,
     ) -> None:
         self.model = model
         self.model.eval()
 
+        # blocks = getattr(self.model, target_layer)
+        # block11 = getattr(blocks, '11')
+        # att = getattr(block11,'attn')
+        # qkv = getattr(att,'qkv')
+        # qkv.register_forward_hook(self.__forward_hook)
+        # qkv.register_backward_hook(self.__backward_hook)
+
         getattr(self.model, target_layer).register_forward_hook(self.__forward_hook)
-        getattr(self.model, target_layer).register_backward_hook(self.__backward_hook)
+        getattr(self.model, target_layer).register_forward_hook(self.__backward_hook)
 
         self.size = size
         self.origin_size = None
@@ -65,15 +74,15 @@ class GradCAM:
         self.grads.clear()
 
     def __img_transform(
-        self, img_arr: np.ndarray, transform: torchvision.transforms
+            self, img_arr: np.ndarray, transform: torchvision.transforms
     ) -> torch.Tensor:
-        img = img_arr.copy() 
+        img = img_arr.copy()
         img = Image.fromarray(np.uint8(img))
-        img = transform(img).unsqueeze(0)  
+        img = transform(img).unsqueeze(0)
         return img
 
     def __img_preprocess(self, img_in: np.ndarray) -> torch.Tensor:
-        self.origin_size = (img_in.shape[1], img_in.shape[0]) 
+        self.origin_size = (img_in.shape[1], img_in.shape[0])
         img = img_in.copy()
         img = cv2.resize(img, self.size)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -104,17 +113,17 @@ class GradCAM:
 
     def __compute_cam(self, feature_map, grads):
         cam = np.zeros(feature_map.shape[1:], dtype=np.float32)
-        alpha = np.mean(grads, axis=(1, 2))  
+        alpha = np.mean(grads, axis=(1, 2))
         for k, ak in enumerate(alpha):
             cam += ak * feature_map[k]
 
-        cam = np.maximum(cam, 0) 
+        cam = np.maximum(cam, 0)
         cam = cv2.resize(cam, self.size)
         cam = (cam - np.min(cam)) / np.max(cam)
         return cam
 
     def __show_cam_on_image(
-        self, img: np.ndarray, mask: np.ndarray, if_show=True, if_write=False, path=""
+            self, img: np.ndarray, mask: np.ndarray, if_show=True, if_write=False, path=""
     ):
         heatmap = cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
         heatmap = np.float32(heatmap) / 255
@@ -127,27 +136,46 @@ class GradCAM:
             plt.imshow(cam[:, :, ::-1])
             plt.show()
 
-if __name__== "__main__":
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser('gradcam script', add_help=False)
-    parser.add_argument('--model', type=str)
-    parser.add_argument('--pth', type=str)
-    parser.add_argument('--layer', type=str)
-    parser.add_argument('--img', type=str)
+    parser.add_argument('--model', default='Xception', type=str)
+    parser.add_argument('--pth', default='/mnt/data/liyihui/face_data/DFDet/model/Xception_FFDF_c23.pyth', type=str)
+    parser.add_argument('--layer', default='block12', type=str)
+    parser.add_argument('--img', default='/mnt/data/liyihui/face_data/DFDet/ana/ana_list/cnn_all_wrong_test_list.txt',
+                        type=str)
+    parser.add_argument('--save_path',
+                        default='/mnt/data/liyihui/face_data/DFDet/ana/ana_visual/xception/', type=str)
+
+    # parser = argparse.ArgumentParser('gradcam script', add_help=False)
+    # parser.add_argument('--model', default='VisionTransformer', type=str)
+    # parser.add_argument('--pth', default='/mnt/data/liyihui/face_data/DFDet/model/VisionTransformer_FFDF_c23.pyth',
+    #                     type=str)
+    # parser.add_argument('--layer', default='blocks', type=str)
+    # parser.add_argument('--img', default='/mnt/data/liyihui/face_data/DFDet/ana/ana_list/cnn_all_wrong_test_list.txt',
+    #                     type=str)
+    # parser.add_argument('--save_path',
+    #                     default='/mnt/data/liyihui/face_data/DFDet/ana/ana_visual/vit/', type=str)
+
     args = parser.parse_args()
     cfg = {"PRETRAINED": False, "ESCAPE": ""}
     net = getattr(models, args.model)(cfg)
     state_dic = torch.load(args.pth)
     print("keys in your model:", state_dic["model_state"].keys())
     load_checkpoint(args.pth, net, False)
-    
-    img = cv2.imread(args.img, 1)
+
     grad_cam = GradCAM(
         net,
         num_cls=2,
         target_layer=args.layer,
-        size=(299, 299),
+        size=(384, 384),
         mean=[0.485, 0.456, 0.406],
         std=[0.229, 0.224, 0.225],
     )
-    
-    grad_cam.forward(img, show=False, write=True, path=args.save_path)
+
+    paths = open(args.img, 'r').readlines()
+    for path in paths:
+        path = path.strip('\n').split()[0]
+        img = cv2.imread(path, 1)
+        save_dir = args.save_path + args.layer + path.replace('/', '_')
+        grad_cam.forward(img, show=False, write=True, path=save_dir)

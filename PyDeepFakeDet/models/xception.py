@@ -227,9 +227,10 @@ class Xception(nn.Module):
         )
         if pretrained == 'imagenet':
             self.load_state_dict(
-                torch.hub.load_state_dict_from_url(
-                    'http://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth'
-                ),
+                # torch.hub.load_state_dict_from_url(
+                #     'http://data.lip6.fr/cadene/pretrainedmodels/xception-43020ad28.pth'
+                # )
+                torch.load('/mnt/data/liyihui/face_data/DFDet/model/xception-43020ad28.pth'),
                 strict=False,
             )
         elif pretrained:

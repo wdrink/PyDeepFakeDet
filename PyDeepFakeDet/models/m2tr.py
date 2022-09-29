@@ -96,10 +96,10 @@ class MultiHeadedAttention(nn.Module):
         _value = self.value_embedding(x)
         attentions = []
         for (width, height), query, key, value in zip(
-            self.patchsize,
-            torch.chunk(_query, len(self.patchsize), dim=1),
-            torch.chunk(_key, len(self.patchsize), dim=1),
-            torch.chunk(_value, len(self.patchsize), dim=1),
+                self.patchsize,
+                torch.chunk(_query, len(self.patchsize), dim=1),
+                torch.chunk(_key, len(self.patchsize), dim=1),
+                torch.chunk(_value, len(self.patchsize), dim=1),
         ):
             out_w, out_h = w // width, h // height
 
@@ -107,20 +107,20 @@ class MultiHeadedAttention(nn.Module):
             query = query.view(b, d_k, out_h, height, out_w, width)
             query = (
                 query.permute(0, 2, 4, 1, 3, 5)
-                .contiguous()
-                .view(b, out_h * out_w, d_k * height * width)
+                    .contiguous()
+                    .view(b, out_h * out_w, d_k * height * width)
             )
             key = key.view(b, d_k, out_h, height, out_w, width)
             key = (
                 key.permute(0, 2, 4, 1, 3, 5)
-                .contiguous()
-                .view(b, out_h * out_w, d_k * height * width)
+                    .contiguous()
+                    .view(b, out_h * out_w, d_k * height * width)
             )
             value = value.view(b, d_k, out_h, height, out_w, width)
             value = (
                 value.permute(0, 2, 4, 1, 3, 5)
-                .contiguous()
-                .view(b, out_h * out_w, d_k * height * width)
+                    .contiguous()
+                    .view(b, out_h * out_w, d_k * height * width)
             )
 
             y, _ = attention(query, key, value)
@@ -281,14 +281,14 @@ class M2TR(nn.Module):
         B = rgb.size(0)
 
         layers = {}
-        rgb = self.model.extract_textures(rgb, layers)
+        rgb = self.model.extract_features(rgb, layers, end_idx=6)
 
         for attn, filter, cma in self.layers:
             rgb = attn(rgb)
             freq = filter(rgb)
             rgb = cma(rgb, freq)
 
-        features = self.model.extract_features(rgb, layers)
+        features = self.model.extract_features(rgb, layers, start_idx=6)
         features = F.adaptive_avg_pool2d(features, (1, 1))
         features = features.view(B, features.size(1))
 
@@ -303,4 +303,3 @@ class M2TR(nn.Module):
 
         output = {"logits": logits, "mask": mask, "features:": features}
         return output
-

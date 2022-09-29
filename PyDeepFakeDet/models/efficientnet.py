@@ -17,7 +17,6 @@ MODEL:
   PRETRAINED: True
 '''
 
-
 # Parameters for the entire model (stem, all blocks, and head)
 GlobalParams = collections.namedtuple(
     'GlobalParams',
@@ -54,7 +53,6 @@ BlockArgs = collections.namedtuple(
 GlobalParams.__new__.__defaults__ = (None,) * len(GlobalParams._fields)
 BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
 
-
 efficientnet_params = {
     # Coefficients:   width,depth,res,dropout
     'efficientnet-b0': (1.0, 1.0, 224, 0.2),
@@ -69,7 +67,6 @@ efficientnet_params = {
     'efficientnet-l2': (4.3, 5.3, 800, 0.5),
 }
 
-
 blocks_args_str = [
     'r1_k3_s11_e1_i32_o16_se0.25',
     'r2_k3_s22_e6_i16_o24_se0.25',
@@ -79,7 +76,6 @@ blocks_args_str = [
     'r4_k5_s22_e6_i112_o192_se0.25',
     'r1_k3_s11_e6_i192_o320_se0.25',
 ]
-
 
 url_map = {
     'efficientnet-b0': 'https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/efficientnet-b0-355c32eb.pth',
@@ -91,7 +87,6 @@ url_map = {
     'efficientnet-b6': 'https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/efficientnet-b6-c76e70fd.pth',
     'efficientnet-b7': 'https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/efficientnet-b7-dcc49843.pth',
 }
-
 
 url_map_advprop = {
     'efficientnet-b0': 'https://github.com/lukemelas/EfficientNet-PyTorch/releases/download/1.0/adv-efficientnet-b0-b64d5a18.pth',
@@ -122,7 +117,7 @@ class BlockDecoder(object):
 
         # Check stride
         assert ('s' in options and len(options['s']) == 1) or (
-            len(options['s']) == 2 and options['s'][0] == options['s'][1]
+                len(options['s']) == 2 and options['s'][0] == options['s'][1]
         )
 
         return BlockArgs(
@@ -225,7 +220,7 @@ class MBConvBlock(nn.Module):
         self._bn_mom = 1 - global_params.batch_norm_momentum
         self._bn_eps = global_params.batch_norm_epsilon
         self.has_se = (self._block_args.se_ratio is not None) and (
-            0 < self._block_args.se_ratio <= 1
+                0 < self._block_args.se_ratio <= 1
         )
         self.id_skip = block_args.id_skip  # skip connection and drop connect
 
@@ -237,7 +232,7 @@ class MBConvBlock(nn.Module):
         # Expansion phase
         inp = self._block_args.input_filters  # number of input channels
         oup = (
-            self._block_args.input_filters * self._block_args.expand_ratio
+                self._block_args.input_filters * self._block_args.expand_ratio
         )  # number of output channels
         if self._block_args.expand_ratio != 1:
             self._expand_conv = Conv2d(
@@ -312,9 +307,9 @@ class MBConvBlock(nn.Module):
             self._block_args.output_filters,
         )
         if (
-            self.id_skip
-            and self._block_args.stride == 1
-            and input_filters == output_filters
+                self.id_skip
+                and self._block_args.stride == 1
+                and input_filters == output_filters
         ):
             if drop_connect_rate:
                 x = drop_connect(x, p=drop_connect_rate, training=self.training)
@@ -330,7 +325,7 @@ class Conv2dStaticSamePadding(nn.Conv2d):
     """2D Convolutions like TensorFlow, for a fixed image size"""
 
     def __init__(
-        self, in_channels, out_channels, kernel_size, image_size=None, **kwargs
+            self, in_channels, out_channels, kernel_size, image_size=None, **kwargs
     ):
         super().__init__(in_channels, out_channels, kernel_size, **kwargs)
         self.stride = (
@@ -476,9 +471,9 @@ class EfficientNet(nn.Module):
         for block in self._blocks:
             block.set_swish(memory_efficient)
 
-    def extract_features(self, x, layers, start_idx = 0, end_idx=None):
+    def extract_features(self, x, layers, start_idx=0, end_idx=None):
         assert start_idx >= 0
-        if start_idx == 0 :
+        if start_idx == 0:
             x = self._swish(self._bn0(self._conv_stem(x)))
             layers['b0'] = x
         if end_idx == None or end_idx > len(self._blocks):
