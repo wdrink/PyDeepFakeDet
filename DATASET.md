@@ -46,3 +46,21 @@ optional arguments:
   --save_dir,    Face data save path
   --process,     Number of processes processed, default=1
 ```
+
+# ----------
+## Installation
+
+```
+pip install tqdm opencv-python retinaface-pytorch
+```
+
+## Usage
+
+```
+python CelebDF.py -path xxx/xxx/Celeb-DF-v2 -samples 8 -scale 1.3
+...
+```
+### params:
+samples: Crop faces from each video.
+
+sacle: The scale factor of bbox of face

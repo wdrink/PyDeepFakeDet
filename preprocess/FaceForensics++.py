@@ -2,7 +2,6 @@ import os
 
 import cv2
 from tqdm import tqdm
-
 from utils import (
     crop_img,
     gen_dirs,
@@ -107,6 +106,22 @@ def solve(
         crop_datas = [
             *map(get_face_location, frames, [face_scale] * len(frames))
         ]
+    file_names = [
+        file_name
+        for i, file_name in enumerate(file_names)
+        if crop_datas[i] is not None
+    ]
+    frames = [
+        frame for i, frame in enumerate(frames) if crop_datas[i] is not None
+    ]
+    new_file_names = [
+        new_file_name
+        for i, new_file_name in enumerate(new_file_names)
+        if crop_datas[i] is not None
+    ]
+    crop_datas = [
+        crop_data for crop_data in crop_datas if crop_data is not None
+    ]
     assert len(frames) == len(file_names), f'{len(frames) != {len(file_names)}}'
     assert len(crop_datas) == len(
         file_names
@@ -137,15 +152,15 @@ def main(path, samples, face_scale, subset):
     faces_path = os.path.join(path, 'faces')
     gen_dirs(faces_path)
 
-    f_train_raw = open(os.path.join(faces_path, 'train_raw.txt'), 'w')
-    f_val_raw = open(os.path.join(faces_path, 'val_raw.txt'), 'w')
-    f_test_raw = open(os.path.join(faces_path, 'test_raw.txt'), 'w')
-    f_train_c23 = open(os.path.join(faces_path, 'train_c23.txt'), 'w')
-    f_val_c23 = open(os.path.join(faces_path, 'val_c23.txt'), 'w')
-    f_test_c23 = open(os.path.join(faces_path, 'test_c23.txt'), 'w')
-    f_train_c40 = open(os.path.join(faces_path, 'train_c40.txt'), 'w')
-    f_val_c40 = open(os.path.join(faces_path, 'val_c40.txt'), 'w')
-    f_test_c40 = open(os.path.join(faces_path, 'test_c40.txt'), 'w')
+    f_train_raw = open(os.path.join(faces_path, subset + '_train_raw.txt'), 'w')
+    f_val_raw = open(os.path.join(faces_path, subset + '_val_raw.txt'), 'w')
+    f_test_raw = open(os.path.join(faces_path, subset + '_test_raw.txt'), 'w')
+    f_train_c23 = open(os.path.join(faces_path, subset + '_train_c23.txt'), 'w')
+    f_val_c23 = open(os.path.join(faces_path, subset + '_val_c23.txt'), 'w')
+    f_test_c23 = open(os.path.join(faces_path, subset + '_test_c23.txt'), 'w')
+    f_train_c40 = open(os.path.join(faces_path, subset + '_train_c40.txt'), 'w')
+    f_val_c40 = open(os.path.join(faces_path, subset + '_val_c40.txt'), 'w')
+    f_test_c40 = open(os.path.join(faces_path, subset + '_test_c40.txt'), 'w')
 
     # FaceShifter don't have masks
     if subset == 'FF':
@@ -166,11 +181,18 @@ def main(path, samples, face_scale, subset):
         train_split, val_split, test_split = get_DFD_splits(
             os.path.join(
                 path,
+                'original_sequences',
+                'actors',
+                'raw',
+                'videos',
+            ),
+            os.path.join(
+                path,
                 'manipulated_sequences',
                 'DeepFakeDetection',
                 'raw',
                 'videos',
-            )
+            ),
         )
     for i, dataset in enumerate(datasets):
         print(f'Now parsing {dataset}...')

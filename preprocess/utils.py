@@ -41,7 +41,9 @@ def parse_video(
 def video2face_jpgs(video_path, save_path, samples, face_scale):
     gen_dirs(save_path)
     file_names, frames = video2frames(video_path, samples)
-    faces = [face for face in map(img2face, frames, [face_scale] * len(frames)) if face is not None]
+    faces = [*map(img2face, frames, [face_scale] * len(frames))]
+    file_names = [file_name for i, file_name in enumerate(file_names) if faces[i] is not None]
+    faces = [face for face in faces if face is not None]
     [
         *map(
             cv2.imwrite,
