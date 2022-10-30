@@ -1,16 +1,12 @@
 DATASET:
   IMG_SIZE: 380
   TRAIN_AUGMENTATIONS:
-    COMPOSE:
-      [
-        Resize,
-        HorizontalFlip,
-        Normalize
-      ]
-    NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+    Resize: [380, 380]
+    HorizontalFlip:
+    Normalize: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
   TEST_AUGMENTATIONS:
-    COMPOSE: [Resize, Normalize]
-    NORMALIZE_PARAMS: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
+    Resize: [380, 380]
+    Normalize: [[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]]
 DATALOADER:
   BATCH_SIZE: 8
   NUM_WORKERS: 4

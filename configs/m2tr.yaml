@@ -23,24 +23,15 @@ OPTIMIZER:
 DATASET:
   IMG_SIZE: 320
   TRAIN_AUGMENTATIONS:
-    COMPOSE:
-      [
-        [
-          ColorJitter,
-          RandomBrightnessContrast,
-          HueSaturationValue,
-          CLAHE,
-          RandomGamma,
-          Sharpen
-        ],
-        GaussNoise,
-        HorizontalFlip,
-        ImageCompression,
-        RandomResizedCrop,
-        Normalize
-      ]
-    RANDOMRESIZEDCROP_PARAMS: [320, 320, [0.8, 1], [0.75, 1.33]]
-    ROTATE_PARAMS: [10]
-    COARSEDROPOUT_PARAMS: [10, 10]
-    IMAGECOMPRESSION_PARAMS: [65, 80]
-    NORMALIZE_PARAMS: [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]
+    OneOf:
+      ColorJitter:
+      RandomBrightnessContrast:
+      HueSaturationValue:
+      CLAHE:
+      RandomGamma:
+      Sharpen:
+    GaussNoise:
+    HorizontalFlip:
+    ImageCompression: [65, 80]
+    RandomResizedCrop: [320, 320, [0.8, 1], [0.75, 1.33]]
+    Normalize: [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]
