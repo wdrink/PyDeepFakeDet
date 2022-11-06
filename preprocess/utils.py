@@ -42,7 +42,11 @@ def video2face_jpgs(video_path, save_path, samples, face_scale):
     gen_dirs(save_path)
     file_names, frames = video2frames(video_path, samples)
     faces = [*map(img2face, frames, [face_scale] * len(frames))]
-    file_names = [file_name for i, file_name in enumerate(file_names) if faces[i] is not None]
+    file_names = [
+        file_name
+        for i, file_name in enumerate(file_names)
+        if faces[i] is not None
+    ]
     faces = [face for face in faces if face is not None]
     [
         *map(
@@ -117,6 +121,15 @@ def crop_img(img, xy):
 def get_files_from_path(path):
     files = os.listdir(path)
     return [f for f in files if f != '.DS_Store' and f != '.dircksum']
+
+
+def read_txt(path):
+    assert path.endswith('.txt')
+    lines = []
+    with open(path) as f:
+        for line in f.readlines():
+            lines.append(line.strip())
+    return lines
 
 
 def gen_dirs(path):
